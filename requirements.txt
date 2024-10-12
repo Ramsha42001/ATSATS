@@ -1,0 +1,8 @@
+streamlit
+nltk
+spacy
+re
+time
+datetime
+pymysql
+base64

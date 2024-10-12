@@ -2,5 +2,5 @@ streamlit
 nltk
 spacy
 pymysql
-pdfminer
-PIL
+pdfminer.six
+Pillow

@@ -2,3 +2,5 @@ streamlit
 nltk
 spacy
 pymysql
+pdfminer
+PIL

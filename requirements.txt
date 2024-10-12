@@ -1,7 +1,7 @@
 streamlit==1.25.0
 nltk==3.9.1
 spacy==3.7.0
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0.tar.gz
 pymysql==1.0.3
 pdfminer.six==20221105
-Pillow==10.0.0
-
+Pillow==9.5.0

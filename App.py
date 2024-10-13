@@ -4,7 +4,6 @@ import re
 import time
 import datetime
 import pymysql
-import base64
 from pdfminer.high_level import extract_text
 
 # Database connection
@@ -22,12 +21,17 @@ def pdf_reader(file):
     text = extract_text(file)
     return text
 
-# Function to show uploaded PDF
-def show_pdf(file_path):
+# Function to allow PDF download
+def allow_pdf_download(file_path):
     with open(file_path, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
-    st.markdown(pdf_display, unsafe_allow_html=True)
+        pdf_bytes = f.read()
+    st.download_button(
+        label="Download Resume PDF",
+        data=pdf_bytes,
+        file_name="resume.pdf",
+        mime="application/pdf",
+    )
+    st.write("Download and open the PDF to view it.")
 
 # Function to insert user data into the database
 def insert_data(name, email, res_score, timestamp, no_of_pages, reco_field, cand_level, skills, recommended_skills, courses):
@@ -110,7 +114,7 @@ def run():
             save_image_path = './Uploaded_Resumes/' + pdf_file.name
             with open(save_image_path, "wb") as f:
                 f.write(pdf_file.getbuffer())
-            show_pdf(save_image_path)
+            allow_pdf_download(save_image_path)
 
             # Read resume text using pdf_reader function
             resume_text = pdf_reader(save_image_path)

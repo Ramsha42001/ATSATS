@@ -7,33 +7,17 @@ import datetime
 import pymysql
 import base64
 from pdfminer.high_level import extract_text
-from spacy.cli import download
 
-# Download NLTK stopwords if not already downloaded
-nltk.download('stopwords')
-
-# Function to load SpaCy model
-def load_spacy_model():
-    try:
-        nlp = spacy.load("en_core_web_sm")
-        return nlp
-    except OSError:
-        st.error("SpaCy model 'en_core_web_sm' not found. Downloading...")
-        try:
-            download("en_core_web_sm")  # Attempt to download the model
-            nlp = spacy.load("en_core_web_sm")  # Load the model again after downloading
-            return nlp
-        except Exception as e:
-            st.error(f"Error loading SpaCy model: {e}")
-            return None
+# Load SpaCy model
+nlp = spacy.load("en_core_web_sm")
 
 # Database connection
 connection = pymysql.connect(
     host='sql12.freesqldatabase.com',
     user='sql12737444',
     password='9nXqPhZ4FU',
-    db='sql12737444',
-    port=3306
+    db='sql12737444',  # Database name
+    port=3306  # Default MySQL port
 )
 cursor = connection.cursor()
 
@@ -83,13 +67,15 @@ def extract_skills(text):
 def calculate_resume_score(skills, cand_level):
     base_score = 0
     if skills:
-        base_score += len(skills) * 10
+        base_score += len(skills) * 10  # Each skill gives 10 points
+
     if cand_level == "Fresher":
         base_score += 5
     elif cand_level == "Intermediate":
         base_score += 10
     elif cand_level == "Experienced":
         base_score += 15
+
     return base_score
 
 # Streamlit page configuration
@@ -97,16 +83,12 @@ st.set_page_config(page_title="Smart Resume Analyzer")
 
 # Main function
 def run():
-    nlp = load_spacy_model()
-    if nlp is None:
-        st.stop()  # Stop execution if model loading fails
-
     st.title("Smart Resume Analyzer")
     st.sidebar.markdown("# Choose User")
     activities = ["Normal User", "Admin"]
     choice = st.sidebar.selectbox("Choose among the given options:", activities)
 
-    # Create table if it does not exist
+    # Create table if not exists
     DB_table_name = 'user_data'
     table_sql = f"""
         CREATE TABLE IF NOT EXISTS {DB_table_name} (
@@ -134,6 +116,7 @@ def run():
                 f.write(pdf_file.getbuffer())
             show_pdf(save_image_path)
 
+            # Read resume text using pdf_reader function
             resume_text = pdf_reader(save_image_path)
 
             st.header("**Resume Analysis**")
@@ -162,12 +145,16 @@ def run():
 
             # Insert into table
             ts = time.time()
-            cur_date = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
-            cur_time = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
-            timestamp = str(cur_date + '_' + cur_time)
+            timestamp = str(datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))
 
+            # Insert the data into the database
             insert_data(name, email, resume_score, timestamp, no_of_pages, "Field", cand_level, str(skills), str([]), str([]))
+            st.success("Data successfully saved!")
+
+    elif choice == 'Admin':
+        st.subheader("Admin Panel")
+        # Add admin functionality here
 
 # Run the application
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

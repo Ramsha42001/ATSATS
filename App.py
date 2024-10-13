@@ -8,6 +8,7 @@ import pymysql
 import base64
 from pdfminer.high_level import extract_text
 import subprocess
+import sys  # Importing sys module
 
 # Download NLTK stopwords if not already downloaded
 nltk.download('stopwords')

@@ -8,8 +8,12 @@ import pymysql
 import base64
 from pdfminer.high_level import extract_text
 
+# Ensure that you check the correct version of Streamlit
+# You can run this command in your environment:
+# pip show streamlit
+
 # Function to load SpaCy model safely
-@st.singleton
+@st.cache_resource
 def load_spacy_model():
     try:
         nlp = spacy.load("en_core_web_sm")

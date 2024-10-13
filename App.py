@@ -8,8 +8,17 @@ import pymysql
 import base64
 from pdfminer.high_level import extract_text
 
+# Function to load SpaCy model safely
+def load_spacy_model():
+    try:
+        nlp = spacy.load("en_core_web_sm")
+        return nlp
+    except OSError:
+        st.error("SpaCy model 'en_core_web_sm' is not available. Please make sure it's installed properly.")
+        return None
+
 # Load SpaCy model
-nlp = spacy.load("en_core_web_sm")
+nlp = load_spacy_model()
 
 # Database connection
 connection = pymysql.connect(

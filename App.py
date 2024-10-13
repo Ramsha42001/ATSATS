@@ -7,7 +7,6 @@ import datetime
 import pymysql
 import base64
 from pdfminer.high_level import extract_text
-from PIL import Image
 
 # Download NLTK stopwords if not already downloaded
 nltk.download('stopwords')
@@ -81,9 +80,6 @@ def run():
     st.sidebar.markdown("# Choose User")
     activities = ["Normal User", "Admin"]
     choice = st.sidebar.selectbox("Choose among the given options:", activities)
-    img = Image.open('./chameleon.png')  # Update path if needed
-    img = img.resize((250, 250))
-    st.image(img)
 
     # Create the DB
     db_sql = """CREATE DATABASE IF NOT EXISTS SRA;"""

@@ -9,6 +9,7 @@ import base64
 from pdfminer.high_level import extract_text
 
 # Function to load SpaCy model safely
+@st.singleton
 def load_spacy_model():
     try:
         nlp = spacy.load("en_core_web_sm")
@@ -19,6 +20,16 @@ def load_spacy_model():
 
 # Load SpaCy model
 nlp = load_spacy_model()
+
+# Database connection
+connection = pymysql.connect(
+    host='sql12.freesqldatabase.com',
+    user='sql12737444',
+    password='9nXqPhZ4FU',
+    db='sql12737444',  # Database name
+    port=3306  # Default MySQL port
+)
+cursor = connection.cursor()
 
 # Function to read PDF file
 def pdf_reader(file):
@@ -32,21 +43,8 @@ def show_pdf(file_path):
     pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
     st.markdown(pdf_display, unsafe_allow_html=True)
 
-# Database connection context
-@st.experimental_singleton
-def get_db_connection():
-    return pymysql.connect(
-        host='sql12.freesqldatabase.com',
-        user='sql12737444',
-        password='9nXqPhZ4FU',
-        db='sql12737444',
-        port=3306
-    )
-
 # Function to insert user data into the database
 def insert_data(name, email, res_score, timestamp, no_of_pages, reco_field, cand_level, skills, recommended_skills, courses):
-    connection = get_db_connection()
-    cursor = connection.cursor()
     DB_table_name = 'user_data'
     insert_sql = f"""
         INSERT INTO {DB_table_name} 
@@ -56,8 +54,6 @@ def insert_data(name, email, res_score, timestamp, no_of_pages, reco_field, cand
     rec_values = (name, email, str(res_score), timestamp, str(no_of_pages), reco_field, cand_level, skills, recommended_skills, courses)
     cursor.execute(insert_sql, rec_values)
     connection.commit()
-    cursor.close()
-    connection.close()
 
 # Function to extract name from text
 def extract_name(text):
@@ -104,8 +100,6 @@ def run():
 
     # Create table if not exists
     DB_table_name = 'user_data'
-    connection = get_db_connection()
-    cursor = connection.cursor()
     table_sql = f"""
         CREATE TABLE IF NOT EXISTS {DB_table_name} (
             ID INT NOT NULL AUTO_INCREMENT,
@@ -123,9 +117,6 @@ def run():
         );
     """
     cursor.execute(table_sql)
-    connection.commit()
-    cursor.close()
-    connection.close()
 
     if choice == 'Normal User':
         pdf_file = st.file_uploader("Choose your Resume", type=["pdf"])
@@ -142,7 +133,7 @@ def run():
             name = extract_name(resume_text)
             email = extract_email(resume_text)
             skills = extract_skills(resume_text)
-            no_of_pages = resume_text.count('\f') + 1  # Count pages based on form feed characters
+            no_of_pages = 1  # You might want to implement actual page count logic
 
             st.success("Hello " + name)
             st.subheader("**Your Basic Info**")

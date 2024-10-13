@@ -10,19 +10,15 @@ from pdfminer.high_level import extract_text
 
 # Download NLTK stopwords if not already downloaded
 nltk.download('stopwords')
+
 # Function to load SpaCy model
 def load_spacy_model():
     try:
-        return spacy.load('en_core_web_sm')
+        nlp = spacy.load("en_core_web_sm")
+        return nlp
     except Exception as e:
         st.error(f"Error loading SpaCy model: {e}")
         return None
-
-# Later in the run function
-nlp = load_spacy_model()
-if nlp is None:
-    st.stop()  # Stop execution if model loading fails
-
 
 # Database connection
 connection = pymysql.connect(host='localhost', user='root', password='', db='sra')
@@ -88,6 +84,10 @@ st.set_page_config(page_title="Smart Resume Analyzer")
 
 # Main function
 def run():
+    nlp = load_spacy_model()
+    if nlp is None:
+        st.stop()  # Stop execution if model loading fails
+
     st.title("Smart Resume Analyzer")
     st.sidebar.markdown("# Choose User")
     activities = ["Normal User", "Admin"]

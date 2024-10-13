@@ -5,3 +5,6 @@ build-essential
 libopenblas-dev
 liblapack-dev
 libblas-dev
+libgl1
+libglib2.0-0
+

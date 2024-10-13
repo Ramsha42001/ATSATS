@@ -7,8 +7,7 @@ import datetime
 import pymysql
 import base64
 from pdfminer.high_level import extract_text
-import subprocess
-import sys  # Importing sys module
+from spacy.cli import download
 
 # Download NLTK stopwords if not already downloaded
 nltk.download('stopwords')
@@ -20,9 +19,8 @@ def load_spacy_model():
         return nlp
     except OSError:
         st.error("SpaCy model 'en_core_web_sm' not found. Downloading...")
-        # Attempt to download the model using subprocess
         try:
-            subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
+            download("en_core_web_sm")  # Attempt to download the model
             nlp = spacy.load("en_core_web_sm")  # Load the model again after downloading
             return nlp
         except Exception as e:
@@ -34,8 +32,8 @@ connection = pymysql.connect(
     host='sql12.freesqldatabase.com',
     user='sql12737444',
     password='9nXqPhZ4FU',
-    db='sql12737444',  # Changed to your provided database name
-    port=3306  # Default MySQL port
+    db='sql12737444',
+    port=3306
 )
 cursor = connection.cursor()
 
@@ -84,18 +82,14 @@ def extract_skills(text):
 # Function to calculate resume score based on extracted data
 def calculate_resume_score(skills, cand_level):
     base_score = 0
-    # Base score calculation based on skills
     if skills:
-        base_score += len(skills) * 10  # Each skill gives 10 points
-
-    # Candidate level scoring
+        base_score += len(skills) * 10
     if cand_level == "Fresher":
-        base_score += 5  # Add 5 points for being a fresher
+        base_score += 5
     elif cand_level == "Intermediate":
-        base_score += 10  # Add 10 points for intermediate
+        base_score += 10
     elif cand_level == "Experienced":
-        base_score += 15  # Add 15 points for experienced
-
+        base_score += 15
     return base_score
 
 # Streamlit page configuration
@@ -112,7 +106,7 @@ def run():
     activities = ["Normal User", "Admin"]
     choice = st.sidebar.selectbox("Choose among the given options:", activities)
 
-    # Create table
+    # Create table if it does not exist
     DB_table_name = 'user_data'
     table_sql = f"""
         CREATE TABLE IF NOT EXISTS {DB_table_name} (
@@ -140,7 +134,6 @@ def run():
                 f.write(pdf_file.getbuffer())
             show_pdf(save_image_path)
 
-            # Read resume text using pdf_reader function
             resume_text = pdf_reader(save_image_path)
 
             st.header("**Resume Analysis**")
@@ -173,7 +166,6 @@ def run():
             cur_time = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
             timestamp = str(cur_date + '_' + cur_time)
 
-            # Insert the data into the database
             insert_data(name, email, resume_score, timestamp, no_of_pages, "Field", cand_level, str(skills), str([]), str([]))
 
 # Run the application

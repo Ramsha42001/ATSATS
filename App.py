@@ -21,7 +21,13 @@ def load_spacy_model():
         return None
 
 # Database connection
-connection = pymysql.connect(host='localhost', user='root', password='', db='sra')
+connection = pymysql.connect(
+    host='sql12.freesqldatabase.com',
+    user='sql12737444',
+    password='9nXqPhZ4FU',
+    db='sql12737444',  # Changed to your provided database name
+    port=3306  # Default MySQL port
+)
 cursor = connection.cursor()
 
 # Function to read PDF file
@@ -39,7 +45,11 @@ def show_pdf(file_path):
 # Function to insert user data into the database
 def insert_data(name, email, res_score, timestamp, no_of_pages, reco_field, cand_level, skills, recommended_skills, courses):
     DB_table_name = 'user_data'
-    insert_sql = f"INSERT INTO {DB_table_name} (Name, Email_ID, resume_score, Timestamp, Page_no, Predicted_Field, User_level, Actual_skills, Recommended_skills, Recommended_courses) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    insert_sql = f"""
+        INSERT INTO {DB_table_name} 
+        (Name, Email_ID, resume_score, Timestamp, Page_no, Predicted_Field, User_level, Actual_skills, Recommended_skills, Recommended_courses) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
     rec_values = (name, email, str(res_score), timestamp, str(no_of_pages), reco_field, cand_level, skills, recommended_skills, courses)
     cursor.execute(insert_sql, rec_values)
     connection.commit()
@@ -93,10 +103,6 @@ def run():
     activities = ["Normal User", "Admin"]
     choice = st.sidebar.selectbox("Choose among the given options:", activities)
 
-    # Create the DB
-    db_sql = """CREATE DATABASE IF NOT EXISTS SRA;"""
-    cursor.execute(db_sql)
-
     # Create table
     DB_table_name = 'user_data'
     table_sql = f"""
@@ -116,8 +122,8 @@ def run():
         );
     """
     cursor.execute(table_sql)
-    
-    if choice == 'Normal User': 
+
+    if choice == 'Normal User':
         pdf_file = st.file_uploader("Choose your Resume", type=["pdf"])
         if pdf_file is not None:
             save_image_path = './Uploaded_Resumes/' + pdf_file.name
@@ -139,7 +145,7 @@ def run():
             st.text('Name: ' + name)
             st.text('Email: ' + email)
             st.text('Resume pages: ' + str(no_of_pages))
-            
+
             # Example candidate level based on number of pages
             cand_level = "Fresher" if no_of_pages == 1 else "Intermediate" if no_of_pages == 2 else "Experienced"
             st.markdown(f'<h4 style="text-align: left; color: #1ed760;">You are looking {cand_level}.</h4>', unsafe_allow_html=True)

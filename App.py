@@ -7,6 +7,7 @@ import datetime
 import pymysql
 import base64
 from pdfminer.high_level import extract_text
+from spacy.cli import download
 
 # Download NLTK stopwords if not already downloaded
 nltk.download('stopwords')
@@ -16,9 +17,15 @@ def load_spacy_model():
     try:
         nlp = spacy.load("en_core_web_sm")
         return nlp
-    except Exception as e:
-        st.error(f"Error loading SpaCy model: {e}")
-        return None
+    except OSError:
+        st.error("SpaCy model 'en_core_web_sm' not found. Downloading...")
+        try:
+            download("en_core_web_sm")  # Attempt to download the model
+            nlp = spacy.load("en_core_web_sm")  # Load the model again after downloading
+            return nlp
+        except Exception as e:
+            st.error(f"Error loading SpaCy model: {e}")
+            return None
 
 # Database connection
 connection = pymysql.connect(

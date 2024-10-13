@@ -5,5 +5,5 @@ thinc==8.1.8  # Use a compatible version
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0.tar.gz
 pymysql==1.0.3
 pdfminer.six==20221105
-Pillow-SIMD==9.2.0
+Pillow
 

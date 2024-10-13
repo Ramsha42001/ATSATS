@@ -20,12 +20,11 @@ def load_spacy_model():
     except OSError:
         st.error("SpaCy model 'en_core_web_sm' not found. Downloading...")
         try:
-            # Attempt to download the model
-            download("en_core_web_sm")  
+            download("en_core_web_sm")  # Attempt to download the model
             nlp = spacy.load("en_core_web_sm")  # Load the model again after downloading
             return nlp
         except Exception as e:
-            st.error(f"Error downloading SpaCy model: {e}")
+            st.error(f"Error loading SpaCy model: {e}")
             return None
 
 # Database connection
@@ -33,7 +32,7 @@ connection = pymysql.connect(
     host='sql12.freesqldatabase.com',
     user='sql12737444',
     password='9nXqPhZ4FU',
-    db='sql12737444',  # Your provided database name
+    db='sql12737444',  # Changed to your provided database name
     port=3306  # Default MySQL port
 )
 cursor = connection.cursor()

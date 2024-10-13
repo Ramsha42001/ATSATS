@@ -1,10 +1,6 @@
-libjpeg-dev
-zlib1g-dev
-libfreetype6-dev
-build-essential
-libopenblas-dev
-liblapack-dev
-libblas-dev
 libgl1
 libglib2.0-0
-
+libjpeg-dev
+zlib1g-dev
+libpng-dev
+libtiff-dev
